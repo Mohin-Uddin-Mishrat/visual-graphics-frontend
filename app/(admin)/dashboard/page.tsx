@@ -1,6 +1,7 @@
 'use client';
 
 import { useGetClientAssetsQuery, useDeleteClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
+import { useToast } from '@/lib/toast';
 
 function DashboardCard({ title, value, change, color }: { title: string; value: string; change: string; color: string }) {
   return (
@@ -23,19 +24,18 @@ function getDaysSinceUpload(createdAt: string): number {
 export default function DashboardPage() {
   const { data, isLoading, isError, error, refetch } = useGetClientAssetsQuery();
   const [deleteClientAsset, { isLoading: isDeleting }] = useDeleteClientAssetMutation();
+  const { addToast } = useToast();
 
   const total = data?.length ?? 0;
   const recent: ClientAsset[] = data?.slice(0, 3) ?? [];
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this client asset?')) {
-      try {
-        await deleteClientAsset(id).unwrap();
-        refetch(); // Refresh the data after deletion
-      } catch (error) {
-        console.error('Failed to delete asset:', error);
-        alert('Failed to delete asset. Please try again.');
-      }
+    try {
+      await deleteClientAsset(id).unwrap();
+      addToast('Client asset deleted successfully', 'success');
+    } catch (error) {
+      console.error('Failed to delete asset:', error);
+      addToast('Failed to delete asset. Please try again.', 'error');
     }
   };
 
