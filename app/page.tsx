@@ -1,65 +1,109 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { HiArrowRight, HiChartBarSquare, HiSparkles } from 'react-icons/hi2';
+
+function ActionCard({
+  title,
+  description,
+  href,
+  status,
+  disabled = false,
+}: {
+  title: string;
+  description: string;
+  href?: string;
+  status: string;
+  disabled?: boolean;
+}) {
+  const content = (
+    <div
+      className={[
+        'group relative overflow-hidden rounded-3xl border p-6 transition duration-300',
+        disabled
+          ? 'cursor-not-allowed border-slate-200 bg-slate-100/90 opacity-80'
+          : 'cursor-pointer border-slate-200 bg-white hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl',
+      ].join(' ')}
+    >
+      <div
+        className={[
+          'absolute inset-x-0 top-0 h-1',
+          disabled ? 'bg-slate-300' : 'bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400',
+        ].join(' ')}
+      />
+
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div
+          className={[
+            'rounded-2xl p-3',
+            disabled ? 'bg-slate-200 text-slate-500' : 'bg-blue-50 text-blue-600',
+          ].join(' ')}
+        >
+          {disabled ? <HiSparkles className="h-7 w-7" /> : <HiChartBarSquare className="h-7 w-7" />}
+        </div>
+        <span
+          className={[
+            'rounded-full px-3 py-1 text-xs font-semibold',
+            disabled ? 'bg-slate-200 text-slate-600' : 'bg-emerald-100 text-emerald-700',
+          ].join(' ')}
+        >
+          {status}
+        </span>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h2>
+        <p className="text-sm leading-6 text-slate-600">{description}</p>
+      </div>
+
+      <div
+        className={[
+          'mt-8 inline-flex items-center gap-2 text-sm font-semibold',
+          disabled ? 'text-slate-500' : 'text-blue-600',
+        ].join(' ')}
+      >
+        <span>{disabled ? 'Coming soon' : 'Open dashboard'}</span>
+        <HiArrowRight className={['h-4 w-4', disabled ? '' : 'transition group-hover:translate-x-1'].join(' ')} />
+      </div>
+    </div>
+  );
+
+  if (disabled || !href) {
+    return content;
+  }
+
+  return <Link href={href}>{content}</Link>;
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#f8fbff_0%,_#eef4ff_100%)] px-4 py-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <span className="inline-flex rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-700">
+            Visual Graphics
+          </span>
+          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+            Choose where you want to go
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-4 text-base leading-7 text-slate-600">
+            Start from the dashboard or keep the second card ready for the next flow.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <ActionCard
+            title="Dashboard"
+            description="Open the main dashboard to manage client assets, uploads, and the current visual workflow."
+            href="/dashboard"
+            status="Available"
+          />
+          <ActionCard
+            title="More Tools"
+            description="This space is reserved for the next module. The card is designed and visible, but it does not redirect anywhere yet."
+            status="Coming Soon"
+            disabled
+          />
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
