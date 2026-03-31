@@ -23,12 +23,11 @@ function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloadi
     <article className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 group">
       <img
         src={asset.imageUrl}
-        alt={`${asset.clientName} asset`}
+        alt={`Client asset ${asset.id}`}
         className="h-48 w-full object-cover transition-transform group-hover:scale-105"
         loading="lazy"
       />
       <div className="p-5">
-        <h3 className="text-xl font-bold text-slate-900 mb-1">{asset.clientName}</h3>
         <p className="text-sm text-slate-600 mb-2">Uploaded: {new Date(asset.createdAt).toLocaleString()}</p>
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
@@ -61,7 +60,7 @@ function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloadi
 }
 
 export default function ClientUploadsPage() {
-  const { data, isLoading, isError, error, refetch } = useGetClientAssetsSentQuery();
+  const { data, isLoading, isError, error } = useGetClientAssetsSentQuery();
   const [deleteClientAsset, { isLoading: isDeleting }] = useDeleteClientAssetMutation();
   const [downloadClientAsset, { isLoading: isDownloading }] = useDownloadClientAssetMutation();
   const { addToast } = useToast();

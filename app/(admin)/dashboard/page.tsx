@@ -3,7 +3,7 @@
 import { useGetClientAssetsQuery, useDeleteClientAssetMutation, useCreateClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
 import { useToast } from '@/lib/toast';
 import { useState } from 'react';
-import { HiOutlineClipboardDocument, HiOutlineTrash } from 'react-icons/hi2';
+import { HiOutlineClipboardDocument } from 'react-icons/hi2';
 
 function DashboardCard({ title, value, change, color }: { title: string; value: string; change: string; color: string }) {
   return (
@@ -39,11 +39,10 @@ function ImageModal({ asset, onClose }: { asset: ClientAsset | null; onClose: ()
         </button>
         <img
           src={asset.imageUrl}
-          alt={`${asset.clientName} asset`}
+          alt={`Client asset ${asset.id}`}
           className="w-full h-full object-contain rounded-lg"
         />
         <div className="mt-4 bg-white rounded-lg p-4">
-          <h3 className="text-xl font-semibold text-gray-900">{asset.clientName}</h3>
           <p className="text-sm text-gray-600 mt-1">Uploaded: {new Date(asset.createdAt).toLocaleString()}</p>
           <p className="text-sm text-gray-600">{getDaysSinceUpload(asset.createdAt)} days ago</p>
          
@@ -57,10 +56,9 @@ export default function DashboardPage() {
   const { data, isLoading, isError, error } = useGetClientAssetsQuery();
   const [createClientAsset, { isLoading: isCreating }] = useCreateClientAssetMutation();
   const [deleteClientAsset, { isLoading: isDeleting }] = useDeleteClientAssetMutation();
-  const { addToast } = useToast();
+  const { addToast, updateToast, removeToast } = useToast();
   const [selectedAsset, setSelectedAsset] = useState<ClientAsset | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [clientName, setClientName] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
   const total = data?.length ?? 0;
@@ -90,30 +88,46 @@ export default function DashboardPage() {
 
   const closeFormModal = () => {
     setShowFormModal(false);
-    setClientName('');
     setFile(null);
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!clientName.trim() || !file) {
-      addToast('Client name and file are required.', 'error');
+    if (!file) {
+      addToast('A file is required.', 'error');
       return;
     }
 
     try {
       const payload = new FormData();
-      payload.append('clientName', clientName);
       payload.append('isClientSent', 'false');
       payload.append('file', file);
 
-      await createClientAsset(payload).unwrap();
-      addToast('Client asset created successfully', 'success');
+      const toastId = addToast('Uploading client asset...', 'info', { progress: 0, persistent: true });
+
+      await createClientAsset({
+        formData: payload,
+        onUploadProgress: (progress) => {
+          updateToast(toastId, {
+            message: progress >= 100 ? 'Finishing upload...' : 'Uploading client asset...',
+            type: 'info',
+            progress,
+          });
+        },
+      }).unwrap();
+
+      updateToast(toastId, {
+        message: 'Client asset uploaded successfully',
+        type: 'success',
+        progress: 100,
+      });
+      setTimeout(() => removeToast(toastId), 2000);
       closeFormModal();
     } catch (error) {
       console.error('Failed to create asset:', error);
-      addToast('Failed to create asset. Please try again.', 'error');
+      const toastId = addToast('Upload failed. Please try again.', 'error', { progress: 100, persistent: true });
+      setTimeout(() => removeToast(toastId), 4000);
     }
   };
 
@@ -151,14 +165,13 @@ export default function DashboardPage() {
               <article key={item.id} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm group cursor-pointer">
                 <img
                   src={item.imageUrl}
-                  alt={`${item.clientName} asset`}
+                  alt={`Client asset ${item.id}`}
                   className="h-48 w-full object-cover transition-transform group-hover:scale-105"
                   loading="lazy"
                   onClick={() => handleCardClick(item)}
                 />
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-slate-900">{item.clientName}</h3>
-                  <p className="text-sm text-slate-500 mt-1">Uploaded: {new Date(item.createdAt).toLocaleString()}</p>
+                  <p className="text-sm text-slate-500">Uploaded: {new Date(item.createdAt).toLocaleString()}</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-full">
                       {getDaysSinceUpload(item.createdAt)} days ago
@@ -202,13 +215,7 @@ export default function DashboardPage() {
         )}
       </section>
 
-      <section className="bg-gradient-to-r from-indigo-50 to-cyan-50 rounded-3xl border border-indigo-100 p-6 shadow-inner">
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Overview</h2>
-        <p className="text-slate-600 leading-relaxed">
-          This dashboard is connected to <code className="rounded bg-slate-100 px-1 py-px">{process.env.NEXT_PUBLIC_API_BASE_URL}</code> and shows live client assets.
-          Keep an eye on freshness, capacity, and feedback loops for improved upload handling.
-        </p>
-      </section>
+      
 
       <ImageModal asset={selectedAsset} onClose={closeModal} />
 
@@ -224,15 +231,6 @@ export default function DashboardPage() {
               </button>
             </div>
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Client Name</label>
-                <input
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  required
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Is Client Sent</label>
                 <input

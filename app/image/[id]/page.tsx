@@ -64,7 +64,7 @@ export default function ImagePage() {
     <div className="min-h-screen  text-white flex flex-col items-center justify-center  p-4">
       <img
         src={asset.imageUrl}
-        alt={asset.clientName}
+        alt={`Client asset ${asset.id}`}
         className="w-4/5 max-w-5xl object-contain pt-20 rounded-lg shadow-2xl"
       />
       <div className="mt-6 flex gap-3">

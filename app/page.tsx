@@ -97,10 +97,10 @@ export default function Home() {
             status="Available"
           />
           <ActionCard
-            title="More Tools"
-            description="This space is reserved for the next module. The card is designed and visible, but it does not redirect anywhere yet."
-            status="Coming Soon"
-            disabled
+            title="Client Upload"
+            description="Open the client upload page so clients can send image files directly into the asset pipeline."
+            href="/image/upload"
+            status="Available"
           />
         </div>
       </div>

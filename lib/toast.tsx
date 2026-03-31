@@ -6,11 +6,13 @@ interface Toast {
   id: string;
   message: string;
   type: 'success' | 'error' | 'info';
+  progress?: number;
 }
 
 interface ToastContextType {
   toasts: Toast[];
-  addToast: (message: string, type: 'success' | 'error' | 'info') => void;
+  addToast: (message: string, type: 'success' | 'error' | 'info', options?: { progress?: number; persistent?: boolean }) => string;
+  updateToast: (id: string, updates: Partial<Omit<Toast, 'id'>>) => void;
   removeToast: (id: string) => void;
 }
 
@@ -19,14 +21,21 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = useCallback((message: string, type: 'success' | 'error' | 'info') => {
+  const addToast = useCallback((message: string, type: 'success' | 'error' | 'info', options?: { progress?: number; persistent?: boolean }) => {
     const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, message, type }]);
+    setToasts(prev => [...prev, { id, message, type, progress: options?.progress }]);
 
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      setToasts(prev => prev.filter(toast => toast.id !== id));
-    }, 5000);
+    if (!options?.persistent) {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(toast => toast.id !== id));
+      }, 5000);
+    }
+
+    return id;
+  }, []);
+
+  const updateToast = useCallback((id: string, updates: Partial<Omit<Toast, 'id'>>) => {
+    setToasts(prev => prev.map(toast => (toast.id === id ? { ...toast, ...updates } : toast)));
   }, []);
 
   const removeToast = useCallback((id: string) => {
@@ -34,7 +43,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+    <ToastContext.Provider value={{ toasts, addToast, updateToast, removeToast }}>
       {children}
       <ToastContainer />
     </ToastContext.Provider>
@@ -83,6 +92,20 @@ function Toast({ toast, onClose }: { toast: Toast; onClose: () => void }) {
           </svg>
         </button>
       </div>
+      {typeof toast.progress === 'number' && (
+        <div className="mt-3">
+          <div className="mb-1 flex items-center justify-between text-xs font-semibold text-white/90">
+            <span>Uploading</span>
+            <span>{toast.progress}%</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-white/25">
+            <div
+              className="h-full rounded-full bg-white transition-[width] duration-200"
+              style={{ width: `${toast.progress}%` }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

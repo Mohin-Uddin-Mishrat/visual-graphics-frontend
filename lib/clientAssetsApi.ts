@@ -2,7 +2,6 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export type ClientAsset = {
   id: string;
-  clientName: string;
   imageUrl: string;
   createdAt: string;
   isClientSent: boolean;
@@ -13,6 +12,15 @@ type ClientAssetsResponse = {
   success: boolean;
   message: string;
   data: ClientAsset[];
+};
+
+type CreateClientAssetArgs = {
+  formData: FormData;
+  onUploadProgress?: (progress: number) => void;
+};
+
+type CreateClientAssetResponse = {
+  success: true;
 };
 
 export const clientAssetsApi = createApi({
@@ -33,12 +41,51 @@ export const clientAssetsApi = createApi({
       transformResponse: (response: ClientAssetsResponse) => response.data || [],
       providesTags: ['ClientAssets'],
     }),
-    createClientAsset: builder.mutation<void, FormData>({
-      query: (body) => ({
-        url: '/api/v1/cloude-flare/client-assets',
-        method: 'POST',
-        body,
-      }),
+    createClientAsset: builder.mutation<CreateClientAssetResponse, CreateClientAssetArgs>({
+      queryFn: async ({ formData, onUploadProgress }) => {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://visual-graphics.onrender.com';
+        const url = `${baseUrl}/api/v1/cloude-flare/client-assets`;
+
+        return await new Promise((resolve) => {
+          const xhr = new XMLHttpRequest();
+
+          xhr.open('POST', url);
+
+          xhr.upload.onprogress = (event) => {
+            if (!event.lengthComputable) {
+              return;
+            }
+
+            onUploadProgress?.(Math.min(99, Math.round((event.loaded / event.total) * 100)));
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              onUploadProgress?.(100);
+              resolve({ data: { success: true } });
+              return;
+            }
+
+            resolve({
+              error: {
+                status: xhr.status,
+                data: xhr.responseText || 'Upload failed',
+              },
+            });
+          };
+
+          xhr.onerror = () => {
+            resolve({
+              error: {
+                status: 'FETCH_ERROR',
+                error: 'Network error while uploading file',
+              },
+            });
+          };
+
+          xhr.send(formData);
+        });
+      },
       invalidatesTags: ['ClientAssets'],
     }),
     deleteClientAsset: builder.mutation<void, string>({
