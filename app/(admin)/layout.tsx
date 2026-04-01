@@ -13,6 +13,7 @@ const AdminLayout = ({
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard' },
+    { name: 'List Of Asset', href: '/listOfAsset' },
     { name: 'Upload', href: '/upload' },
     { name: 'Orders', href: '/clientUploads' },
   ];
