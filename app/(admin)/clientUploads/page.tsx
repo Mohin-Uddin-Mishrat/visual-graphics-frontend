@@ -1,6 +1,7 @@
 'use client';
 
 import { useGetClientAssetsSentQuery, useDeleteClientAssetMutation, useDownloadClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
+import { getClientAssetDownloadName, getClientAssetPreviewSrc, isZipAssetUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 import { HiOutlineCloudArrowDown, HiOutlineTrash } from 'react-icons/hi2';
 
@@ -22,12 +23,15 @@ function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloadi
   return (
     <article className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 group">
       <img
-        src={asset.imageUrl}
+        src={getClientAssetPreviewSrc(asset.imageUrl)}
         alt={`Client asset ${asset.id}`}
         className="h-48 w-full object-cover transition-transform group-hover:scale-105"
         loading="lazy"
       />
       <div className="p-5">
+        {isZipAssetUrl(asset.imageUrl) && (
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">ZIP Asset</p>
+        )}
         <p className="text-sm text-slate-600 mb-2">Uploaded: {new Date(asset.createdAt).toLocaleString()}</p>
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
@@ -83,7 +87,7 @@ export default function ClientUploadsPage() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `client-asset-${id}.webp`; // Assuming webp format based on sample data
+      link.download = getClientAssetDownloadName(id, blob);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

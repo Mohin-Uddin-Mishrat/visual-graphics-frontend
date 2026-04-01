@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useCreateClientAssetMutation } from '@/lib/clientAssetsApi';
+import { CLIENT_ASSET_ACCEPT, isImageFile } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 
 export default function ImageUploadPage() {
@@ -32,7 +33,7 @@ export default function ImageUploadPage() {
     event.preventDefault();
 
     if (!file) {
-      addToast('Please choose an image file first.', 'error');
+      addToast('Please choose a ZIP or image file first.', 'error');
       return;
     }
 
@@ -41,13 +42,13 @@ export default function ImageUploadPage() {
       payload.append('isClientSent', 'true');
       payload.append('file', file);
 
-      const toastId = addToast('Uploading image...', 'info', { progress: 0, persistent: true });
+      const toastId = addToast('Uploading file...', 'info', { progress: 0, persistent: true });
 
       await createClientAsset({
         formData: payload,
         onUploadProgress: (progress) => {
           updateToast(toastId, {
-            message: progress >= 100 ? 'Finishing upload...' : 'Uploading image...',
+            message: progress >= 100 ? 'Finishing upload...' : 'Uploading file...',
             type: 'info',
             progress,
           });
@@ -55,14 +56,14 @@ export default function ImageUploadPage() {
       }).unwrap();
 
       updateToast(toastId, {
-        message: 'Image uploaded successfully.',
+        message: 'File uploaded successfully.',
         type: 'success',
         progress: 100,
       });
       setTimeout(() => removeToast(toastId), 2000);
       handleFileChange(null);
     } catch (error) {
-      console.error('Failed to upload image:', error);
+      console.error('Failed to upload file:', error);
       const toastId = addToast('Upload failed. Please try again.', 'error', { progress: 100, persistent: true });
       setTimeout(() => removeToast(toastId), 4000);
     }
@@ -100,7 +101,7 @@ export default function ImageUploadPage() {
                     : 'border-slate-300 bg-[linear-gradient(180deg,_#eef6ff_0%,_#dbeafe_100%)] hover:border-cyan-400 hover:bg-[linear-gradient(180deg,_#f3fbff_0%,_#dcecff_100%)]',
                 ].join(' ')}
               >
-                {previewUrl ? (
+                {previewUrl && isImageFile(file) ? (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-4">
                     <img
                       src={previewUrl}
@@ -114,20 +115,25 @@ export default function ImageUploadPage() {
                 ) : (
                   <div className="max-w-md space-y-4">
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl shadow-sm">
-                      <span aria-hidden="true">+</span>
+                      <span aria-hidden="true">{file ? 'ZIP' : '+'}</span>
                     </div>
                     <div>
-                      <p className="text-xl font-bold text-slate-900 sm:text-2xl">Drop client image here</p>
+                      <p className="text-xl font-bold text-slate-900 sm:text-2xl">Drop client file here</p>
                       <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">
-                        Or click to browse from your device. JPG, PNG, WEBP, GIF and other image files are supported.
+                        Or click to browse from your device. ZIP, JPG, PNG, WEBP, GIF and other image files are supported.
                       </p>
+                      {file && (
+                        <div className="mt-4 rounded-full bg-white/85 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
+                          {file.name}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
                 <input
                   type="file"
-                  accept="image/*,.gif"
+                  accept={CLIENT_ASSET_ACCEPT}
                   className="hidden"
                   onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
                 />

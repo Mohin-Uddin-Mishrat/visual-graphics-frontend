@@ -13,7 +13,8 @@ const AdminLayout = ({
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Client Uploads', href: '/clientUploads' },
+    { name: 'Upload', href: '/upload' },
+    { name: 'Orders', href: '/clientUploads' },
   ];
 
   const isActive = (href: string) => pathname === href;

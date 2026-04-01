@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export type ClientAsset = {
   id: string;
@@ -20,7 +21,10 @@ type CreateClientAssetArgs = {
 };
 
 type CreateClientAssetResponse = {
-  success: true;
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: ClientAsset;
 };
 
 export const clientAssetsApi = createApi({
@@ -46,7 +50,7 @@ export const clientAssetsApi = createApi({
         const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://visual-graphics.onrender.com';
         const url = `${baseUrl}/api/v1/cloude-flare/client-assets`;
 
-        return await new Promise((resolve) => {
+        return await new Promise<{ data: CreateClientAssetResponse } | { error: FetchBaseQueryError }>((resolve) => {
           const xhr = new XMLHttpRequest();
 
           xhr.open('POST', url);
@@ -62,7 +66,18 @@ export const clientAssetsApi = createApi({
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
               onUploadProgress?.(100);
-              resolve({ data: { success: true } });
+              try {
+                resolve({ data: JSON.parse(xhr.responseText) as CreateClientAssetResponse });
+              } catch {
+                resolve({
+                  error: {
+                    status: 'PARSING_ERROR',
+                    originalStatus: xhr.status,
+                    data: xhr.responseText || 'Invalid upload response',
+                    error: 'Failed to parse upload response',
+                  },
+                });
+              }
               return;
             }
 

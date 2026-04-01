@@ -1,6 +1,8 @@
 'use client';
 
-import { useGetClientAssetsQuery, useDeleteClientAssetMutation, useCreateClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
+import Link from 'next/link';
+import { useGetClientAssetsQuery, useDeleteClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
+import { getClientAssetPreviewSrc, getClientAssetShareUrl, isZipAssetUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 import { useState } from 'react';
 import { HiOutlineClipboardDocument } from 'react-icons/hi2';
@@ -38,7 +40,7 @@ function ImageModal({ asset, onClose }: { asset: ClientAsset | null; onClose: ()
           </svg>
         </button>
         <img
-          src={asset.imageUrl}
+          src={getClientAssetPreviewSrc(asset.imageUrl)}
           alt={`Client asset ${asset.id}`}
           className="w-full h-full object-contain rounded-lg"
         />
@@ -54,12 +56,9 @@ function ImageModal({ asset, onClose }: { asset: ClientAsset | null; onClose: ()
 
 export default function DashboardPage() {
   const { data, isLoading, isError, error } = useGetClientAssetsQuery();
-  const [createClientAsset, { isLoading: isCreating }] = useCreateClientAssetMutation();
   const [deleteClientAsset, { isLoading: isDeleting }] = useDeleteClientAssetMutation();
-  const { addToast, updateToast, removeToast } = useToast();
+  const { addToast } = useToast();
   const [selectedAsset, setSelectedAsset] = useState<ClientAsset | null>(null);
-  const [showFormModal, setShowFormModal] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
 
   const total = data?.length ?? 0;
   const recent: ClientAsset[] = data ?? [];
@@ -82,55 +81,6 @@ export default function DashboardPage() {
     setSelectedAsset(null);
   };
 
-  const openFormModal = () => {
-    setShowFormModal(true);
-  };
-
-  const closeFormModal = () => {
-    setShowFormModal(false);
-    setFile(null);
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!file) {
-      addToast('A file is required.', 'error');
-      return;
-    }
-
-    try {
-      const payload = new FormData();
-      payload.append('isClientSent', 'false');
-      payload.append('file', file);
-
-      const toastId = addToast('Uploading client asset...', 'info', { progress: 0, persistent: true });
-
-      await createClientAsset({
-        formData: payload,
-        onUploadProgress: (progress) => {
-          updateToast(toastId, {
-            message: progress >= 100 ? 'Finishing upload...' : 'Uploading client asset...',
-            type: 'info',
-            progress,
-          });
-        },
-      }).unwrap();
-
-      updateToast(toastId, {
-        message: 'Client asset uploaded successfully',
-        type: 'success',
-        progress: 100,
-      });
-      setTimeout(() => removeToast(toastId), 2000);
-      closeFormModal();
-    } catch (error) {
-      console.error('Failed to create asset:', error);
-      const toastId = addToast('Upload failed. Please try again.', 'error', { progress: 100, persistent: true });
-      setTimeout(() => removeToast(toastId), 4000);
-    }
-  };
-
   return (
     <div>
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -138,12 +88,12 @@ export default function DashboardPage() {
           <h1 className="text-4xl font-extrabold text-slate-900">Dashboard</h1>
           <p className="text-slate-600 mt-1">Live client asset status from API</p>
         </div>
-        <button
-          onClick={openFormModal}
+        <Link
+          href="/upload"
           className="rounded-xl bg-indigo-600 px-5 py-3 text-white font-semibold hover:bg-indigo-700 transition"
         >
           Add Client Asset
-        </button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -164,13 +114,16 @@ export default function DashboardPage() {
             {recent.map((item) => (
               <article key={item.id} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm group cursor-pointer">
                 <img
-                  src={item.imageUrl}
+                  src={getClientAssetPreviewSrc(item.imageUrl)}
                   alt={`Client asset ${item.id}`}
                   className="h-48 w-full object-cover transition-transform group-hover:scale-105"
                   loading="lazy"
                   onClick={() => handleCardClick(item)}
                 />
                 <div className="p-4">
+                  {isZipAssetUrl(item.imageUrl) && (
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">ZIP Asset</p>
+                  )}
                   <p className="text-sm text-slate-500">Uploaded: {new Date(item.createdAt).toLocaleString()}</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-full">
@@ -180,7 +133,7 @@ export default function DashboardPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          const copyUrl = `${window.location.origin}/image/${item.id}`;
+                          const copyUrl = getClientAssetShareUrl(window.location.origin, item.id, item.imageUrl);
                           navigator.clipboard.writeText(copyUrl).then(() => {
                             addToast('Link copied to clipboard', 'success');
                           }).catch(() => {
@@ -218,57 +171,6 @@ export default function DashboardPage() {
       
 
       <ImageModal asset={selectedAsset} onClose={closeModal} />
-
-      {showFormModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={closeFormModal}>
-          <div className="relative w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold">Upload New Client Asset</h3>
-              <button onClick={closeFormModal} className="text-gray-500 hover:text-gray-700">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Is Client Sent</label>
-                <input
-                  type="text"
-                  value="false"
-                  disabled
-                  className="mt-1 w-full rounded-lg border border-gray-300 bg-gray-100 p-2 text-gray-600"
-                />
-                <input type="hidden" name="isClientSent" value="false" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">File</label>
-                <label className="mt-1 block cursor-pointer rounded-xl border-2 border-dashed border-blue-300 bg-blue-50 p-6 text-center hover:border-blue-400 hover:bg-blue-100">
-                  <span className="text-sm text-blue-700">Drag files here or <span className="font-semibold text-blue-900">choose from folder</span></span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                    className="mt-2 hidden"
-                    required
-                  />
-                </label>
-                {file && <div className="mt-2 text-xs text-slate-700">Selected file: {file.name}</div>}
-              </div>
-              <div className="flex justify-end gap-3">
-                <button type="button" onClick={closeFormModal} className="rounded-lg border border-gray-300 px-4 py-2">Cancel</button>
-                <button
-                  type="submit"
-                  disabled={isCreating}
-                  className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700 disabled:opacity-50"
-                >
-                  {isCreating ? 'Uploading...' : 'Submit'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
