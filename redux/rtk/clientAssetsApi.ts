@@ -34,7 +34,6 @@ export const clientAssetsApi = createApi({
   }),
   tagTypes: ['ClientAssets'],
   endpoints: (builder) => ({
-
     getClientAssets: builder.query<ClientAsset[], void>({
       query: () => '/api/v1/cloude-flare/client-assets?isClientSent=false',
       transformResponse: (response: ClientAssetsResponse) => response.data || [],

@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import { HiOutlineArrowUpTray, HiOutlineDocument } from 'react-icons/hi2';
-import { useCreateClientAssetMutation } from '@/lib/clientAssetsApi';
+import { useCreateClientAssetMutation } from '@/redux';
 import { CLIENT_ASSET_ACCEPT, getClientAssetShareUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 

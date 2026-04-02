@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetClientAssetsSentQuery, useDeleteClientAssetMutation, useDownloadClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
+import { useGetClientAssetsSentQuery, useDeleteClientAssetMutation, useDownloadClientAssetMutation, type ClientAsset } from '@/redux';
 import { getClientAssetDownloadName, getClientAssetPreviewSrc, isZipAssetUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 import { HiOutlineCloudArrowDown, HiOutlineTrash } from 'react-icons/hi2';

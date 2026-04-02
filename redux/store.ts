@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { clientAssetsApi } from './clientAssetsApi';
+import { clientAssetsApi } from './rtk';
 
 export const store = configureStore({
   reducer: {

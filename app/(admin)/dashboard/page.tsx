@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useGetClientAssetsQuery, useDeleteClientAssetMutation, type ClientAsset } from '@/lib/clientAssetsApi';
+import { useGetClientAssetsQuery, useDeleteClientAssetMutation, type ClientAsset } from '@/redux';
 import { getClientAssetPreviewSrc, getClientAssetShareUrl, isZipAssetUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 import { useState } from 'react';

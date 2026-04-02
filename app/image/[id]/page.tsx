@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useGetClientAssetByIdQuery, useDownloadClientAssetMutation } from '@/lib/clientAssetsApi';
+import { useGetClientAssetByIdQuery, useDownloadClientAssetMutation } from '@/redux';
 import {
   getAssetFileName,
   getClientAssetDownloadName,

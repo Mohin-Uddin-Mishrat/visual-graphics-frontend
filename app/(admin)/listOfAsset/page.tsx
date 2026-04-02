@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetClientAssetsQuery, useDeleteClientAssetMutation } from '@/lib/clientAssetsApi';
+import { useGetClientAssetsQuery, useDeleteClientAssetMutation } from '@/redux';
 import { getAssetFileName, getClientAssetPreviewSrc, getClientAssetShareUrl, isZipAssetUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
 import { HiOutlineClipboardDocument } from 'react-icons/hi2';
