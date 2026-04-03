@@ -128,7 +128,7 @@ export default function AddUserPage() {
               </label>
 
               <div className="md:col-span-2 flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-4">
-                <p className="text-sm text-slate-600">This sends a `POST` request to `/api/v1/auth/users` on your backend.</p>
+                <p className="text-sm text-slate-600">This will create a new user account on your backend.</p>
                 <button
                   type="submit"
                   disabled={isLoading}
