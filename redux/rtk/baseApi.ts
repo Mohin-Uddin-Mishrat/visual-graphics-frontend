@@ -18,6 +18,8 @@ const AUTHENTICATED_ENDPOINTS = new Set([
   'getUsers',
   'updateUserRole',
   'updateUserPassword',
+  'updateOwnProfile',
+  'changeOwnPassword',
   'deleteUser',
 ]);
 
