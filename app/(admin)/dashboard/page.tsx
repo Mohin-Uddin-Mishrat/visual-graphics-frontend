@@ -7,16 +7,6 @@ import { useToast } from '@/lib/toast';
 import { useState } from 'react';
 import { HiOutlineClipboardDocument } from 'react-icons/hi2';
 
-function DashboardCard({ title, value, change, color }: { title: string; value: string; change: string; color: string }) {
-  return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-      <div className="text-sm font-semibold text-slate-500">{title}</div>
-      <div className="mt-3 text-3xl font-bold text-slate-900">{value}</div>
-      <div className={`mt-2 text-xs font-medium rounded-full px-2 py-1 inline-flex items-center ${color}`}>{change}</div>
-    </div>
-  );
-}
-
 function getDaysSinceUpload(createdAt: string): number {
   const uploadDate = new Date(createdAt);
   const now = new Date();
@@ -30,10 +20,10 @@ function ImageModal({ asset, onClose }: { asset: ClientAsset | null; onClose: ()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="relative max-w-4xl max-h-[90vh] p-4" onClick={(e) => e.stopPropagation()}>
+      <div className="relative max-h-[90vh] w-full max-w-4xl p-3 sm:p-4" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+          className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white transition-colors hover:text-gray-300 sm:-top-12 sm:right-0 sm:bg-transparent sm:p-0"
         >
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -60,7 +50,6 @@ export default function DashboardPage() {
   const { addToast } = useToast();
   const [selectedAsset, setSelectedAsset] = useState<ClientAsset | null>(null);
 
-  const total = data?.length ?? 0;
   const recent: ClientAsset[] = data ?? [];
 
   const handleDelete = async (id: string) => {
@@ -83,13 +72,13 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-4xl font-extrabold text-slate-900">Dashboard</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">Dashboard</h1>
         </div>
         <Link
           href="/upload"
-          className="rounded-xl bg-indigo-600 px-5 py-3 text-white font-semibold hover:bg-indigo-700 transition"
+          className="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 sm:w-auto"
         >
           Add Client Asset
         </Link>
@@ -104,7 +93,7 @@ export default function DashboardPage() {
         {isError && <div className="p-6 text-center text-red-600">Error loading assets: {String(error)}</div>}
 
         {!isLoading && !isError && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {recent.map((item) => (
               <article key={item.id} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm group cursor-pointer">
                 <img

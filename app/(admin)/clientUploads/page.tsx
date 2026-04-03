@@ -33,15 +33,15 @@ function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloadi
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-violet-600">ZIP Asset</p>
         )}
         <p className="text-sm text-slate-600 mb-2">Uploaded: {new Date(asset.createdAt).toLocaleString()}</p>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
             {getDaysSinceUpload(asset.createdAt)} days ago
           </span>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               onClick={() => onDownload(asset.id)}
               disabled={isDownloading}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed shadow-md hover:shadow-lg"
               title="Download asset"
             >
               <HiOutlineCloudArrowDown className="w-4 h-4" />
@@ -50,7 +50,7 @@ function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloadi
             <button
               onClick={() => onDelete(asset.id)}
               disabled={isDeleting}
-              className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed shadow-md hover:shadow-lg"
               title="Delete asset"
             >
               <HiOutlineTrash className="w-4 h-4" />
@@ -100,10 +100,10 @@ export default function ClientUploadsPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="px-0 py-2 sm:px-0">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Client Uploads</h1>
+          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Client Uploads</h1>
           <p className="text-slate-600">Showing only assets where isClientSent=true</p>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function ClientUploadsPage() {
       {isError && <div className="p-6 text-center text-red-600">Error loading uploads: {String(error)}</div>}
 
       {!isLoading && !isError && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data && data.length > 0 ? (
             data.map((asset) => (
               <ClientUploadCard

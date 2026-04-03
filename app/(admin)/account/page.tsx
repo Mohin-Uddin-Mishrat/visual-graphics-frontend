@@ -179,12 +179,12 @@ export default function AccountPage() {
                 />
               </label>
 
-              <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-4">
+              <div className="flex flex-col gap-4 rounded-2xl bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-slate-600">Changes here update your own account details.</p>
                 <button
                   type="submit"
                   disabled={isSavingProfile}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto"
                 >
                   <FiSave className="h-4 w-4" />
                   {isSavingProfile ? 'Saving...' : 'Save Changes'}

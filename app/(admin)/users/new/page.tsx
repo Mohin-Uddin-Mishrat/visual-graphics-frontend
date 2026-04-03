@@ -127,12 +127,12 @@ export default function AddUserPage() {
                 <p className="text-xs text-slate-500">Use a strong password with at least 8 characters.</p>
               </label>
 
-              <div className="md:col-span-2 flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-4">
+              <div className="md:col-span-2 flex flex-col gap-4 rounded-2xl bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-slate-600">This will create a new user account on your backend.</p>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto"
                 >
                   {isLoading ? 'Creating User...' : 'Create User'}
                 </button>

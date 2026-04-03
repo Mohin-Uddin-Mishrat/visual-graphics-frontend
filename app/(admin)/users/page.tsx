@@ -113,7 +113,98 @@ export default function UsersPage() {
             {isError && <div className="p-6 text-center text-red-600">Failed to load users.</div>}
 
             {!isLoading && !isError && (
-              <div className="overflow-x-auto">
+              <>
+                <div className="divide-y divide-slate-100 md:hidden">
+                  {users.map((user) => {
+                    const rowState = getRowState(user.id, user.role);
+
+                    return (
+                      <article key={user.id} className="space-y-4 p-4">
+                        <div className="flex flex-col gap-2">
+                          <div>
+                            <p className="text-base font-semibold text-slate-900">{user.name}</p>
+                            <p className="text-sm text-slate-600">{user.email}</p>
+                          </div>
+                          <span
+                            className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold ${
+                              user.role === 'ADMIN'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {user.role}
+                          </span>
+                        </div>
+
+                        <div className="grid gap-4">
+                          <div className="space-y-2">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Edit Role</p>
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                              <select
+                                value={rowState.role}
+                                onChange={(event) =>
+                                  updateRowState(
+                                    user.id,
+                                    { role: event.target.value as 'ADMIN' | 'USER' },
+                                    user.role
+                                  )
+                                }
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                              >
+                                <option value="USER">USER</option>
+                                <option value="ADMIN">ADMIN</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => handleRoleSave(user.id, rowState.role)}
+                                disabled={isUpdatingRole}
+                                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Edit Password</p>
+                            <div className="flex flex-col gap-2">
+                              <input
+                                type="password"
+                                value={rowState.password}
+                                onChange={(event) =>
+                                  updateRowState(user.id, { password: event.target.value }, user.role)
+                                }
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                                placeholder="New password"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handlePasswordSave(user.id, rowState.password, user.role)}
+                                disabled={isUpdatingPassword}
+                                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                              >
+                                Update Password
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(user.id, user.email)}
+                          disabled={isDeleting}
+                          className="w-full rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Delete User
+                        </button>
+                      </article>
+                    );
+                  })}
+
+                  {users.length === 0 && <div className="p-6 text-center text-slate-600">No users found.</div>}
+                </div>
+
+                <div className="hidden overflow-x-auto md:block">
                 <table className="min-w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50">
                     <tr>
@@ -206,9 +297,10 @@ export default function UsersPage() {
                     })}
                   </tbody>
                 </table>
+                </div>
 
-                {users.length === 0 && <div className="p-6 text-center text-slate-600">No users found.</div>}
-              </div>
+                {users.length === 0 && <div className="hidden p-6 text-center text-slate-600 md:block">No users found.</div>}
+              </>
             )}
           </section>
         </div>
