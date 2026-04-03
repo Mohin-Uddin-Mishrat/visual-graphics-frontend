@@ -15,8 +15,8 @@ function getDaysSinceUpload(createdAt: string): number {
 
 function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloading }: {
   asset: ClientAsset;
-  onDelete: (id: string) => void;
-  onDownload: (id: string) => void;
+  onDelete: (id: number) => void;
+  onDownload: (id: number) => void;
   isDeleting: boolean;
   isDownloading: boolean;
 }) {
@@ -69,7 +69,7 @@ export default function ClientUploadsPage() {
   const [downloadClientAsset, { isLoading: isDownloading }] = useDownloadClientAssetMutation();
   const { addToast } = useToast();
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this client asset?')) {
       try {
         await deleteClientAsset(id).unwrap();
@@ -81,7 +81,7 @@ export default function ClientUploadsPage() {
     }
   };
 
-  const handleDownload = async (id: string) => {
+  const handleDownload = async (id: number) => {
     try {
       const blob = await downloadClientAsset(id).unwrap();
       const url = window.URL.createObjectURL(blob);

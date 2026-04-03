@@ -4,7 +4,7 @@ import type { RootState } from '@/redux/store';
 import { api } from './baseApi';
 
 export type ClientAsset = {
-  id: string;
+  id: number;
   imageUrl: string;
   createdAt: string;
   isClientSent: boolean;
@@ -111,14 +111,14 @@ export const clientAssetsApi = api.injectEndpoints({
       },
       invalidatesTags: ['ClientAssets'],
     }),
-    deleteClientAsset: builder.mutation<void, string>({
+    deleteClientAsset: builder.mutation<void, number>({
       query: (id) => ({
         url: `/api/v1/cloude-flare/client-assets/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['ClientAssets'],
     }),
-    getClientAssetById: builder.query<ClientAsset, string>({
+    getClientAssetById: builder.query<ClientAsset, number>({
       queryFn: async (id) => {
         try {
           const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://visual-graphics.onrender.com';
@@ -156,7 +156,7 @@ export const clientAssetsApi = api.injectEndpoints({
       },
       providesTags: ['ClientAssets'],
     }),
-    downloadClientAsset: builder.mutation<Blob, string>({
+    downloadClientAsset: builder.mutation<Blob, number>({
       query: (id) => ({
         url: `/api/v1/cloude-flare/client-assets/${id}/download`,
         method: 'GET',

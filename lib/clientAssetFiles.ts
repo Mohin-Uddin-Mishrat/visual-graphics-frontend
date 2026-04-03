@@ -35,12 +35,12 @@ export function getAssetFileName(imageUrl: string): string {
   }
 }
 
-export function getClientAssetShareUrl(origin: string, id: string, imageUrl: string) {
+export function getClientAssetShareUrl(origin: string, id: number, imageUrl: string) {
   const fileName = getAssetFileName(imageUrl);
   return `${origin}/image/${id}?file=${encodeURIComponent(fileName)}`;
 }
 
-export function getClientAssetDownloadName(id: string, blob: Blob, prefix = 'client-asset') {
+export function getClientAssetDownloadName(id: number, blob: Blob, prefix = 'client-asset') {
   const extension = MIME_TO_EXTENSION[blob.type] ?? 'bin';
   return `${prefix}-${id}.${extension}`;
 }

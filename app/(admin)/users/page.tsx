@@ -100,15 +100,23 @@ export default function UsersPage() {
     <AdminOnly>
       <main className="min-h-full bg-[linear-gradient(180deg,_#f8fbff_0%,_#eef4ff_100%)] px-4 py-8 sm:px-6 lg:px-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-600">Admin Users</p>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Manage Users</h1>
-            <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
-              Review all users and update role, password, or delete accounts from one place.
-            </p>
-          </div>
+          <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,_rgba(37,99,235,0.12),_rgba(56,189,248,0.08)_42%,_rgba(168,85,247,0.14))] px-6 py-7 shadow-[0_24px_80px_rgba(59,130,246,0.12)] sm:px-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">Admin Users</p>
+                <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Manage Users</h1>
+                <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
+                  Review all users and update role, password, or delete accounts from one place.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/70 bg-white/75 px-4 py-3 shadow-sm backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Team Members</p>
+                <p className="mt-1 text-2xl font-black text-slate-900">{users.length}</p>
+              </div>
+            </div>
+          </section>
 
-          <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+          <section className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/85 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur">
             {isLoading && <div className="p-6 text-center text-slate-600">Loading users...</div>}
             {isError && <div className="p-6 text-center text-red-600">Failed to load users.</div>}
 
@@ -119,7 +127,7 @@ export default function UsersPage() {
                     const rowState = getRowState(user.id, user.role);
 
                     return (
-                      <article key={user.id} className="space-y-4 p-4">
+                      <article key={user.id} className="space-y-4 bg-[linear-gradient(180deg,_rgba(255,255,255,1),_rgba(248,250,252,0.94))] p-4">
                         <div className="flex flex-col gap-2">
                           <div>
                             <p className="text-base font-semibold text-slate-900">{user.name}</p>
@@ -158,7 +166,7 @@ export default function UsersPage() {
                                 type="button"
                                 onClick={() => handleRoleSave(user.id, rowState.role)}
                                 disabled={isUpdatingRole}
-                                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                                className="rounded-xl bg-[linear-gradient(135deg,_#2563eb,_#0ea5e9)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(37,99,235,0.2)] transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:bg-slate-300"
                               >
                                 Save
                               </button>
@@ -181,7 +189,7 @@ export default function UsersPage() {
                                 type="button"
                                 onClick={() => handlePasswordSave(user.id, rowState.password, user.role)}
                                 disabled={isUpdatingPassword}
-                                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                                className="rounded-xl bg-[linear-gradient(135deg,_#0f172a,_#334155)] px-4 py-2 text-sm font-semibold text-white transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:bg-slate-300"
                               >
                                 Update Password
                               </button>
@@ -193,7 +201,7 @@ export default function UsersPage() {
                           type="button"
                           onClick={() => handleDelete(user.id, user.email)}
                           disabled={isDeleting}
-                          className="w-full rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="w-full rounded-xl border border-rose-200 bg-rose-50/70 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           Delete User
                         </button>
@@ -206,7 +214,7 @@ export default function UsersPage() {
 
                 <div className="hidden overflow-x-auto md:block">
                 <table className="min-w-full divide-y divide-slate-200">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-[linear-gradient(180deg,_#f8fbff,_#f1f5f9)]">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Name</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Email</th>
@@ -221,7 +229,7 @@ export default function UsersPage() {
                       const rowState = getRowState(user.id, user.role);
 
                       return (
-                        <tr key={user.id} className="align-top transition hover:bg-slate-50/70">
+                        <tr key={user.id} className="align-top transition hover:bg-sky-50/40">
                           <td className="px-6 py-4 text-sm font-semibold text-slate-900">{user.name}</td>
                           <td className="px-6 py-4 text-sm text-slate-600">{user.email}</td>
                           <td className="px-6 py-4">
@@ -255,7 +263,7 @@ export default function UsersPage() {
                                 type="button"
                                 onClick={() => handleRoleSave(user.id, rowState.role)}
                                 disabled={isUpdatingRole}
-                                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                                className="rounded-xl bg-[linear-gradient(135deg,_#2563eb,_#0ea5e9)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(37,99,235,0.16)] transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:bg-slate-300"
                               >
                                 Save
                               </button>
@@ -276,7 +284,7 @@ export default function UsersPage() {
                                 type="button"
                                 onClick={() => handlePasswordSave(user.id, rowState.password, user.role)}
                                 disabled={isUpdatingPassword}
-                                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                                className="rounded-xl bg-[linear-gradient(135deg,_#0f172a,_#334155)] px-4 py-2 text-sm font-semibold text-white transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:bg-slate-300"
                               >
                                 Update
                               </button>
@@ -287,7 +295,7 @@ export default function UsersPage() {
                               type="button"
                               onClick={() => handleDelete(user.id, user.email)}
                               disabled={isDeleting}
-                              className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="rounded-xl border border-rose-200 bg-rose-50/70 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               Delete
                             </button>
