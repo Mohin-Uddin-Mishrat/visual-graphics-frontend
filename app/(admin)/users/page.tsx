@@ -1,0 +1,218 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { AdminOnly } from '@/components/auth/AdminOnly';
+import {
+  useDeleteUserMutation,
+  useGetUsersQuery,
+  useUpdateUserPasswordMutation,
+  useUpdateUserRoleMutation,
+} from '@/redux';
+import { useToast } from '@/lib/toast';
+
+type EditableState = {
+  role: 'ADMIN' | 'USER';
+  password: string;
+};
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (typeof error !== 'object' || error === null) {
+    return fallback;
+  }
+
+  const maybeError = error as {
+    data?: {
+      message?: string | string[];
+    };
+  };
+
+  if (Array.isArray(maybeError.data?.message)) {
+    return maybeError.data.message.join(', ');
+  }
+
+  return maybeError.data?.message || fallback;
+}
+
+export default function UsersPage() {
+  const { data, isLoading, isError } = useGetUsersQuery();
+  const [updateUserRole, { isLoading: isUpdatingRole }] = useUpdateUserRoleMutation();
+  const [updateUserPassword, { isLoading: isUpdatingPassword }] = useUpdateUserPasswordMutation();
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
+  const { addToast } = useToast();
+  const [editState, setEditState] = useState<Record<string, EditableState>>({});
+
+  const users = useMemo(() => data?.data ?? [], [data]);
+
+  const getRowState = (id: string, role: string): EditableState =>
+    editState[id] ?? {
+      role: role === 'ADMIN' ? 'ADMIN' : 'USER',
+      password: '',
+    };
+
+  const updateRowState = (id: string, nextState: Partial<EditableState>, role: string) => {
+    setEditState((current) => ({
+      ...current,
+      [id]: {
+        ...getRowState(id, role),
+        ...nextState,
+      },
+    }));
+  };
+
+  const handleRoleSave = async (id: string, role: 'ADMIN' | 'USER') => {
+    try {
+      const response = await updateUserRole({ id, role }).unwrap();
+      addToast(response.message || 'User role updated successfully.', 'success');
+    } catch (error) {
+      addToast(getErrorMessage(error, 'Failed to update user role.'), 'error');
+    }
+  };
+
+  const handlePasswordSave = async (id: string, password: string, role: string) => {
+    if (!password.trim()) {
+      addToast('Enter a new password before saving.', 'info');
+      return;
+    }
+
+    try {
+      const response = await updateUserPassword({ id, newPassword: password }).unwrap();
+      addToast(response.message || 'User password updated successfully.', 'success');
+      updateRowState(id, { password: '' }, role);
+    } catch (error) {
+      addToast(getErrorMessage(error, 'Failed to update user password.'), 'error');
+    }
+  };
+
+  const handleDelete = async (id: string, email: string) => {
+    if (!window.confirm(`Delete user ${email}?`)) {
+      return;
+    }
+
+    try {
+      const response = await deleteUser(id).unwrap();
+      addToast(response.message || 'User deleted successfully.', 'success');
+    } catch (error) {
+      addToast(getErrorMessage(error, 'Failed to delete user.'), 'error');
+    }
+  };
+
+  return (
+    <AdminOnly>
+      <main className="min-h-full bg-[linear-gradient(180deg,_#f8fbff_0%,_#eef4ff_100%)] px-4 py-8 sm:px-6 lg:px-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-600">Admin Users</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Manage Users</h1>
+            <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
+              Review all users and update role, password, or delete accounts from one place.
+            </p>
+          </div>
+
+          <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+            {isLoading && <div className="p-6 text-center text-slate-600">Loading users...</div>}
+            {isError && <div className="p-6 text-center text-red-600">Failed to load users.</div>}
+
+            {!isLoading && !isError && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Email</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Role</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Edit Role</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Edit Password</th>
+                      <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {users.map((user) => {
+                      const rowState = getRowState(user.id, user.role);
+
+                      return (
+                        <tr key={user.id} className="align-top transition hover:bg-slate-50/70">
+                          <td className="px-6 py-4 text-sm font-semibold text-slate-900">{user.name}</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">{user.email}</td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                user.role === 'ADMIN'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex min-w-48 items-center gap-2">
+                              <select
+                                value={rowState.role}
+                                onChange={(event) =>
+                                  updateRowState(
+                                    user.id,
+                                    { role: event.target.value as 'ADMIN' | 'USER' },
+                                    user.role
+                                  )
+                                }
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                              >
+                                <option value="USER">USER</option>
+                                <option value="ADMIN">ADMIN</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => handleRoleSave(user.id, rowState.role)}
+                                disabled={isUpdatingRole}
+                                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex min-w-64 items-center gap-2">
+                              <input
+                                type="password"
+                                value={rowState.password}
+                                onChange={(event) =>
+                                  updateRowState(user.id, { password: event.target.value }, user.role)
+                                }
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                                placeholder="New password"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handlePasswordSave(user.id, rowState.password, user.role)}
+                                disabled={isUpdatingPassword}
+                                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                              >
+                                Update
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(user.id, user.email)}
+                              disabled={isDeleting}
+                              className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                {users.length === 0 && <div className="p-6 text-center text-slate-600">No users found.</div>}
+              </div>
+            )}
+          </section>
+        </div>
+      </main>
+    </AdminOnly>
+  );
+}

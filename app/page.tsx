@@ -79,7 +79,7 @@ export default function Home() {
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <span className="inline-flex rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-700">
-            Visual Graphics
+            Vizual Graphics Ltd
           </span>
           <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
             Choose where you want to go
