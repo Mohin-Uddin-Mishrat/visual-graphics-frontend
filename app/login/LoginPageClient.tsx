@@ -60,22 +60,7 @@ export function LoginPageClient({ nextPath }: { nextPath: string }) {
 
   return (
     <main className="flex min-h-screen items-center bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_35%),linear-gradient(180deg,_#f8fbff_0%,_#eef4ff_100%)] px-4 py-12">
-      <div className="mx-auto grid w-full max-w-5xl items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="rounded-[2rem] border border-slate-200 bg-slate-950 px-8 py-10 text-white shadow-[0_30px_80px_rgba(15,23,42,0.16)]">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">Vizual Graphics Ltd</p>
-          <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">Admin access for the asset workflow.</h1>
-          <p className="mt-4 max-w-lg text-sm leading-7 text-slate-300 sm:text-base">
-            Sign in with your existing backend account. The app will use the secure auth cookie for future requests and
-            restore your session automatically on refresh.
-          </p>
-          <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Backend</p>
-            <p className="mt-2 break-all text-sm text-slate-200">
-              {process.env.NEXT_PUBLIC_API_BASE_URL || 'https://visual-graphics.onrender.com'}
-            </p>
-          </div>
-        </section>
-
+      <div className="mx-auto w-full max-w-xl">
         <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
           <div className="mb-8">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-600">Sign In</p>

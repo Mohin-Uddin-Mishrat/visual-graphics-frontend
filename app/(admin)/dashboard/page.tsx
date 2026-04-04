@@ -149,7 +149,7 @@ export default function DashboardPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          const copyUrl = getClientAssetShareUrl(window.location.origin, item.id, item.imageUrl);
+                          const copyUrl = getClientAssetShareUrl(window.location.origin, item.imageUrl);
                           navigator.clipboard.writeText(copyUrl).then(() => {
                             addToast('Link copied to clipboard', 'success');
                           }).catch(() => {

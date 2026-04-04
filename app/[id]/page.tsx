@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useGetClientAssetByIdQuery, useDownloadClientAssetMutation } from '@/redux';
 import {
-  getAssetFileName,
   getClientAssetDownloadName,
   getClientAssetPreviewSrc,
   isZipAssetUrl,
@@ -19,23 +18,22 @@ function getFileExtension(fileName: string) {
 
 export default function ImagePage() {
   const params = useParams();
-  const searchParams = useSearchParams();
-  const idParam = params.id as string | undefined;
-  const assetId = idParam ? Number(idParam) : Number.NaN;
-  const isValidAssetId = Number.isInteger(assetId) && assetId > 0;
-  const { data: asset, isLoading, isError } = useGetClientAssetByIdQuery(assetId, { skip: !isValidAssetId });
+  const fileNameParam = params.id as string | undefined;
+  const fileName = fileNameParam ? decodeURIComponent(fileNameParam) : '';
+  const isValidFileName = fileName.length > 0;
+  const { data: asset, isLoading, isError } = useGetClientAssetByIdQuery(fileName, { skip: !isValidFileName });
   const [downloadClientAsset, { isLoading: isDownloading }] = useDownloadClientAssetMutation();
   const { addToast } = useToast();
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
 
   const handleDownload = async () => {
-    if (!isValidAssetId) return;
+    if (!asset) return;
     try {
-      const blob = await downloadClientAsset(assetId).unwrap();
+      const blob = await downloadClientAsset(asset.id).unwrap();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = getClientAssetDownloadName(assetId, blob, 'asset');
+      link.download = getClientAssetDownloadName(asset.id, blob, 'asset');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -47,17 +45,16 @@ export default function ImagePage() {
     }
   };
 
-  const fileName = searchParams.get('file') || (asset ? getAssetFileName(asset.imageUrl) : `asset-${assetId}`);
   const isZip = asset ? isZipAssetUrl(asset.imageUrl) : fileName.toLowerCase().endsWith('.zip');
   const previewSrc = asset ? getClientAssetPreviewSrc(asset.imageUrl) : '';
   const formatLabel = isZip ? 'ZIP' : getFileExtension(fileName);
 
-  if (!isValidAssetId) {
+  if (!isValidFileName) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#111111] text-white">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white">Invalid Image ID</h1>
-          <p className="text-sm text-slate-400">No valid numeric ID provided.</p>
+          <h1 className="text-2xl font-bold text-white">Invalid Image URL</h1>
+          <p className="text-sm text-slate-400">No valid asset filename provided.</p>
         </div>
       </div>
     );
@@ -76,7 +73,7 @@ export default function ImagePage() {
       <div className="flex min-h-screen items-center justify-center bg-[#111111] text-white">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white">Asset not found</h1>
-          <p className="text-sm text-slate-400">Unable to retrieve client asset for ID: {assetId}</p>
+          <p className="text-sm text-slate-400">Unable to retrieve client asset for: {fileName}</p>
         </div>
       </div>
     );

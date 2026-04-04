@@ -8,7 +8,7 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const resolvedSearchParams = await searchParams;
-  const nextPath = resolvedSearchParams.next || '/dashboard';
+  const nextPath = resolvedSearchParams.next || '/upload';
 
   return <LoginPageClient nextPath={nextPath} />;
 }

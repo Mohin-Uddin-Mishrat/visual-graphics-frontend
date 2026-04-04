@@ -1,9 +1,9 @@
 'use client';
 
 import { useGetClientAssetsSentQuery, useDeleteClientAssetMutation, useDownloadClientAssetMutation, type ClientAsset } from '@/redux';
-import { getClientAssetDownloadName, getClientAssetPreviewSrc, isZipAssetUrl } from '@/lib/clientAssetFiles';
+import { getClientAssetDownloadName, getClientAssetPreviewSrc, getClientAssetShareUrl, isZipAssetUrl } from '@/lib/clientAssetFiles';
 import { useToast } from '@/lib/toast';
-import { HiOutlineCloudArrowDown, HiOutlineTrash } from 'react-icons/hi2';
+import { HiOutlineClipboardDocument, HiOutlineCloudArrowDown, HiOutlineTrash } from 'react-icons/hi2';
 
 function getDaysSinceUpload(createdAt: string): number {
   const uploadDate = new Date(createdAt);
@@ -13,10 +13,11 @@ function getDaysSinceUpload(createdAt: string): number {
   return diffDays;
 }
 
-function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloading }: {
+function ClientUploadCard({ asset, onDelete, onDownload, onCopy, isDeleting, isDownloading }: {
   asset: ClientAsset;
   onDelete: (id: number) => void;
   onDownload: (id: number) => void;
+  onCopy: (imageUrl: string) => void;
   isDeleting: boolean;
   isDownloading: boolean;
 }) {
@@ -38,6 +39,14 @@ function ClientUploadCard({ asset, onDelete, onDownload, isDeleting, isDownloadi
             {getDaysSinceUpload(asset.createdAt)} days ago
           </span>
           <div className="flex flex-col gap-2 sm:flex-row">
+            <button
+              onClick={() => onCopy(asset.imageUrl)}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
+              title="Copy asset link"
+            >
+              <HiOutlineClipboardDocument className="w-4 h-4" />
+              Copy Link
+            </button>
             <button
               onClick={() => onDownload(asset.id)}
               disabled={isDownloading}
@@ -99,6 +108,16 @@ export default function ClientUploadsPage() {
     }
   };
 
+  const handleCopy = async (imageUrl: string) => {
+    try {
+      await navigator.clipboard.writeText(getClientAssetShareUrl(window.location.origin, imageUrl));
+      addToast('Link copied to clipboard', 'success');
+    } catch (error) {
+      console.error('Failed to copy asset link:', error);
+      addToast('Failed to copy link. Please copy manually.', 'error');
+    }
+  };
+
   return (
     <div className="px-0 py-2 sm:px-0">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -120,6 +139,7 @@ export default function ClientUploadsPage() {
                 asset={asset}
                 onDelete={handleDelete}
                 onDownload={handleDownload}
+                onCopy={handleCopy}
                 isDeleting={isDeleting}
                 isDownloading={isDownloading}
               />

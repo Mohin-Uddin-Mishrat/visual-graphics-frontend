@@ -70,7 +70,7 @@ export default function AdminUploadPage() {
       setUploadProgress(100);
       setIsUploaded(true);
       setCopied(false);
-      setCopiedUrl(getClientAssetShareUrl(window.location.origin, response.data.id, response.data.imageUrl));
+      setCopiedUrl(getClientAssetShareUrl(window.location.origin, response.data.imageUrl));
       updateToast(toastId, {
         message: 'Client asset uploaded successfully.',
         type: 'success',

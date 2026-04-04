@@ -39,6 +39,7 @@ const AdminLayout = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems: MenuItem[] = [
+    { name: 'My Profile', href: '/account', icon: FiKey },
     { name: 'Overview', href: '/dashboard', icon: FiBarChart2 },
     { name: 'Asset Library', href: '/listOfAsset', icon: FiGrid },
     { name: 'Upload Center', href: '/upload', icon: FiUploadCloud },
@@ -98,33 +99,8 @@ const AdminLayout = ({
   const sidebarContent = (
     <>
       <div className="border-b border-white/10 p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/90">Visual Graphics</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/90">Vizual Graphics Ltd</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-white">Control Center</h1>
-      </div>
-
-      <div className="border-b border-white/10 px-6 py-5">
-        <p className="text-sm font-semibold text-white">{user?.name || 'Authenticated User'}</p>
-        <p className="mt-1 break-all text-sm text-slate-400">{user?.email}</p>
-        <p className="mt-3 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-blue-200">
-          {user?.role || 'USER'}
-        </p>
-        <Link
-          href="/account"
-          onClick={closeMobileMenu}
-          className={`mt-4 flex items-center justify-between rounded-2xl border px-3 py-3 text-sm font-semibold transition ${
-            isActive('/account')
-              ? 'border-blue-400/30 bg-blue-500/12 text-white'
-              : 'border-white/10 bg-white/6 text-slate-200 hover:border-blue-400/30 hover:bg-blue-500/10 hover:text-white'
-          }`}
-        >
-          <span className="inline-flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/8">
-              <FiKey className="h-3.5 w-3.5" />
-            </span>
-            My Profile
-          </span>
-          <span className="text-xs uppercase tracking-[0.18em] text-slate-400">Open</span>
-        </Link>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 py-6">
@@ -172,7 +148,7 @@ const AdminLayout = ({
             <aside className="relative flex h-full w-[88vw] max-w-[340px] flex-col bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.2),_transparent_28%),linear-gradient(180deg,_#0f172a_0%,_#111827_42%,_#020617_100%)] text-white shadow-[20px_0_60px_rgba(15,23,42,0.24)]">
               <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/90">Visual Graphics</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/90">Vizual Graphics Ltd</p>
                   <p className="mt-1 text-sm font-semibold text-white">Navigation</p>
                 </div>
                 <button
@@ -193,7 +169,7 @@ const AdminLayout = ({
           <div className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-600">Visual Graphics</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-600">Vizual Graphics Ltd</p>
                 <h2 className="truncate text-lg font-bold text-slate-900">Control Center</h2>
               </div>
               <button

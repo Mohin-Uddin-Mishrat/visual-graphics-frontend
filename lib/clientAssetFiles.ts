@@ -35,9 +35,9 @@ export function getAssetFileName(imageUrl: string): string {
   }
 }
 
-export function getClientAssetShareUrl(origin: string, id: number, imageUrl: string) {
+export function getClientAssetShareUrl(origin: string, imageUrl: string) {
   const fileName = getAssetFileName(imageUrl);
-  return `${origin}/image/${id}?file=${encodeURIComponent(fileName)}`;
+  return `${origin}/${encodeURIComponent(fileName)}`;
 }
 
 export function getClientAssetDownloadName(id: number, blob: Blob, prefix = 'client-asset') {

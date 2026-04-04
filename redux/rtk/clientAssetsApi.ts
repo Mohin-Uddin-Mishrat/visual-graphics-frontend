@@ -118,11 +118,11 @@ export const clientAssetsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['ClientAssets'],
     }),
-    getClientAssetById: builder.query<ClientAsset, number>({
-      queryFn: async (id) => {
+    getClientAssetById: builder.query<ClientAsset, string>({
+      queryFn: async (filename) => {
         try {
           const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://visual-graphics.onrender.com';
-          const response = await fetch(`${baseUrl}/api/v1/cloude-flare/client-assets/${id}`, {
+          const response = await fetch(`${baseUrl}/api/v1/cloude-flare/client-assets/${encodeURIComponent(filename)}`, {
             method: 'GET',
             credentials: 'omit',
             cache: 'no-store',
