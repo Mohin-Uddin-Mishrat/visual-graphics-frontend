@@ -1,5 +1,6 @@
 export const CLIENT_ASSET_ACCEPT = 'image/*,.gif,.zip,application/zip,application/x-zip-compressed';
 export const CLIENT_ASSET_ZIP_PREVIEW = '/assets/zip.webp';
+const CLIENT_ASSET_SHARE_BASE_URL = 'https://files.vizualgraphics.com/edited';
 
 const MIME_TO_EXTENSION: Record<string, string> = {
   'application/zip': 'zip',
@@ -35,9 +36,9 @@ export function getAssetFileName(imageUrl: string): string {
   }
 }
 
-export function getClientAssetShareUrl(origin: string, imageUrl: string) {
+export function getClientAssetShareUrl(_origin: string, imageUrl: string) {
   const fileName = getAssetFileName(imageUrl);
-  return `${origin}/${encodeURIComponent(fileName)}`;
+  return `${CLIENT_ASSET_SHARE_BASE_URL}/${encodeURIComponent(fileName)}`;
 }
 
 export function getClientAssetDownloadName(id: number, blob: Blob, prefix = 'client-asset') {
